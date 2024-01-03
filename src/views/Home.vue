@@ -1,121 +1,141 @@
 <template>
-  <div class="justify-center max-w-md mt-10">
-    <h1 class="font-extrabold tracking-tigh text-3xl leading-10">
-      Ready for the challenge?
-    </h1>
-    <div class="mt-8">
-      <section>
-        <h2 class="font-bold text-2xl leading-6">Exercise 1</h2>
-        <div class="mt-5">
-          <p>
-            In the first exercise the goal would be to extend the current app
-            with some additional output. For this you should integrate an public
-            available Rest-API or GraphQL-API (see below for examples).
-          </p>
-          <p>
-            It's your own decision what kind of output you use and in which way
-            it will be displayed, but it should be in a creative way and you can
-            use this possibility to show us your existing skills. For example
-            you can add a list output as a starting point and show additional
-            information in a detail page (or other output types).
-          </p>
-          <br />
-          <p>Here are some examples for a public available API:</p>
-          <ul>
-            <li>
-              <a
-                class="text-blue-600 hover:text-blue-800 cursor-pointer"
-                href="https://github.com/APIs-guru/graphql-apis"
-                target="_blank"
-                >Public GraphQL-API Collection</a
-              >
-              (e.g.
-              <a
-                class="text-blue-600 hover:text-blue-800 cursor-pointer"
-                href="https://api.spacex.land/graphql/"
-                target="_blank"
-                >SpaceX-API</a
-              >)
-            </li>
-            <li>
-              <a
-                class="text-blue-600 hover:text-blue-800 cursor-pointer"
-                href="https://github.com/public-apis/public-apis"
-                target="_blank"
-                >Public REST-API Collection</a
-              >
-              (e.g.
-              <a
-                class="text-blue-600 hover:text-blue-800 cursor-pointer"
-                href="https://pokeapi.co/docs/v2"
-                target="_blank"
-                >Pokemon-API</a
-              >)
-            </li>
-          </ul>
-          -
-        </div>
-        <div class="mt-5">
-          <a
-            class="text-blue-600 hover:text-blue-800 cursor-pointer"
-            v-on:click="showNextExercise('second')"
-            >{{
-              showExercise.second
-                ? 'Hide the next exercise'
-                : 'Show the next exercise'
-            }}</a
-          >
-        </div>
-      </section>
-      <section v-if="showExercise.second" class="mt-10">
-        <h2 class="font-bold text-2xl leading-6">Exercise 2</h2>
-        <div class="mt-5">
-          <p>
-            As a second exercise you should add an global tost/notify handling
-            in the already extended app. Maybe you can do this in a easy way
-            with the new composition API.
-          </p>
-          <p>
-            For example you can show a toast after something was fetched from
-            the public API (which you implemented before) or also in error
-            situtations.
-          </p>
-        </div>
-        <div class="mt-5">
-          <a
-            class="text-blue-600 hover:text-blue-800 cursor-pointer"
-            v-on:click="showNextExercise('third')"
-            >{{
-              showExercise.third
-                ? 'Hide the next exercise'
-                : 'Show the next exercise'
-            }}</a
-          >
-        </div>
-      </section>
-      <section v-if="showExercise.third" class="mt-10">
-        <h2 class="font-bold text-2xl leading-6">Exercise 3</h2>
-        <div class="mt-5">
-          <p>
-            Please integrate a testing library in the current app. We're pretty
-            sure that you have some components which needs to be tested.
-          </p>
-        </div>
-      </section>
+  <div class="mt-8 flex flex-col gap-8 pb-20 w-full max-w-7xl">
+    <img src="/pokemon-logo.png" alt="Pokemon logo" class="w-64 m-auto" />
+
+    <div class="justify-center w-full flex flex-wrap gap-8 mt-8">
+      <preview-card
+        v-for="(item, index) in items"
+        class="hover:-translate-y-2 transition-transform duration-200"
+        :item="item"
+        :key="index"
+        @click="selectCard(item, $event)"
+        :class="{
+          invisible: selected === item,
+        }"
+      />
+    </div>
+
+    <x-button @click="fetchData" class="max-w-28 m-auto">Load more</x-button>
+
+    <div
+      class="fixed top-0 left-0 w-screen h-screen z-50 bg-black bg-opacity-50"
+      v-if="selected"
+      @click.self="closeCard"
+    >
+      <div
+        class="animated-card absolute top-0 left-0"
+        :style="{
+          transform: `translate(${selectedPosition?.left}px, ${selectedPosition?.top}px)`,
+        }"
+      >
+        <preview-card :item="selected" class="backface-hidden" />
+        <details-card
+          v-if="selectedDetails"
+          :item="selectedDetails"
+          style="transform: rotateY(180deg)"
+          class="backface-hidden absolute top-0"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
-import { ShowExercises } from '../types/exercise'
+import { nextTick, ref } from 'vue'
+import PreviewCard from '~/components/PreviewCard.vue'
+import DetailsCard from '~/components/DetailsCard.vue'
+import XButton from '~/components/XButton.vue'
+import { injectStrict } from '~/utils/injection'
+import { ApiKey } from '~/utils/symbols'
+import { Pokemon } from '~/types'
 
-const showExercise = reactive<ShowExercises>({
-  second: false,
-  third: false,
-})
-
-const showNextExercise = (exercise: keyof ShowExercises) => {
-  showExercise[exercise] = !showExercise[exercise]
+interface Card {
+  title: string
+  color?: string
+  image: {
+    src: string
+    alt: string
+  }
 }
+
+const items = ref<Card[]>([])
+const selected = ref<Card | null>(null)
+const selectedDetails = ref<Pokemon | null>(null)
+const selectedPosition = ref<{ top: number; left: number } | null>(null)
+const offset = ref(0)
+const limit = 20
+
+const api = injectStrict(ApiKey)
+
+const fetchData = () => {
+  api.pokemon
+    .getAll({
+      limit,
+      offset: offset.value,
+    })
+    .then((data) => {
+      const parsed = data.results.map((item) => ({
+        title: item.name,
+        image: {
+          src: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${
+            item.url.split('/')[6]
+          }.svg`,
+          alt: item.name,
+        },
+      }))
+
+      items.value = [...items.value, ...parsed]
+
+      offset.value += limit
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
+
+const selectCard = (item: Card, event: MouseEvent) => {
+  selected.value = null
+  selectedPosition.value = null
+
+  const position = (event.currentTarget as Element).getBoundingClientRect()
+
+  nextTick(() => {
+    selected.value = item
+    selectedPosition.value = {
+      top: position.top,
+      left: position.left,
+    }
+  })
+
+  api.pokemon.getOne(item.title).then((pokemon) => {
+    selectedDetails.value = pokemon
+  })
+}
+
+const closeCard = () => {
+  selected.value = null
+  selectedPosition.value = null
+  selectedDetails.value = null
+}
+
+fetchData()
 </script>
+
+<style scoped>
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.animated-card {
+  animation: card-reveal 0.5s ease-in-out forwards;
+  transform-style: preserve-3d;
+}
+
+@keyframes card-reveal {
+  100% {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(2.5) rotateY(180deg);
+  }
+}
+</style>

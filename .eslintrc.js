@@ -56,9 +56,6 @@ module.exports = {
       },
     ],
 
-    // Enforce v-bind directive usage in long form.
-    'vue/v-bind-style': ['error', 'longform'],
-
     // Enforce v-on directive usage in long form.
     'vue/v-on-style': ['error', 'longform'],
 
@@ -73,6 +70,9 @@ module.exports = {
       node: {
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
       },
+      alias: {
+        map: [['~', './src']],
+      },
     },
     // Adding typescript file types, because airbnb doesn't allow this by default.
     'import/extensions': ['.js', '.jsx', '.ts', '.tsx', '.vue'],
@@ -82,6 +82,9 @@ module.exports = {
     defineEmits: 'readonly',
     defineExpose: 'readonly',
     withDefaults: 'readonly',
+  },
+  'import/parsers': {
+    '@typescript-eslint/parser': ['.ts', '.tsx'],
   },
   parser: 'vue-eslint-parser',
   parserOptions: {
