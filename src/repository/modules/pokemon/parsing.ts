@@ -1,8 +1,10 @@
+import { useUserStore } from "~/stores/user";
 import { GetOneResponse } from "./types";
 
 export default {
   getOne: (data: GetOneResponse) => {
     const type = data.types[0].type.name;
+    const userStore = useUserStore();
 
     return {
       name: data.name,
@@ -14,7 +16,8 @@ export default {
         hp: data.stats[0].base_stat,
         speed: data.stats[5].base_stat,
       },
-      type
+      type,
+      starred: userStore.favorites.includes(data.name),
     }
   }
 }

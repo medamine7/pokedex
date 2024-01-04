@@ -4,18 +4,32 @@
     :style="`background: radial-gradient(circle at 20% 0%, ${color} 46%, #ffffff 36%)`"
   >
     <div class="flex justify-between pt-3 px-3 items-center">
+      <img :src="item.sprite" :alt="item.name" class="h-5" draggable="false" />
+
       <x-badge class="bg-white flex gap-2">
         <span class="text-neutral-800 text-[6px] font-bold capitalize">HP</span>
         <span class="text-xs font-bold">{{ item.stats.hp }}</span>
       </x-badge>
 
-      <img :src="item.sprite" :alt="item.name" class="h-5" />
+      <x-icon
+        name="star"
+        class="text-amber-400 cursor-pointer"
+        @click="onStarred"
+        :class="{
+          'fill-current': item.starred,
+        }"
+      />
     </div>
 
     <div
       class="w-full flex-1 px-8 pb-6 pt-2 flex flex-col justify-start items-center"
     >
-      <img class="w-64 mx-auto" :src="item.image" :alt="item.name" />
+      <img
+        class="w-64 mx-auto"
+        :src="item.image"
+        :alt="item.name"
+        draggable="false"
+      />
       <h4
         class="text-lg text-neutral-800 capitalize font-bold tracking-widest mt-2"
       >
@@ -52,6 +66,7 @@
 import { computed } from 'vue'
 import XCard from '~/components/XCard.vue'
 import XBadge from '~/components/XBadge.vue'
+import XIcon from '~/components/XIcon.vue'
 import { Pokemon } from '~/types'
 import { pokemonThemes } from '~/utils/colors'
 
@@ -60,10 +75,19 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const emit = defineEmits<{
+  starred: [value: Pokemon]
+  unstarred: [value: Pokemon]
+}>()
 
 const color = computed(() => {
   if (!props.item) return ''
 
   return pokemonThemes[props.item.type]
 })
+
+const onStarred = () => {
+  if (props.item.starred) emit('unstarred', props.item)
+  else emit('starred', props.item)
+}
 </script>

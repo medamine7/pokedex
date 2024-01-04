@@ -18,7 +18,7 @@
       <h4
         class="text-xl font-bold font-fun tracking-widest text-transparent bg-clip-text bg-gradient-to-br from-slate-200 to-slate-600"
       >
-        {{ item.title }}
+        {{ item.name }}
       </h4>
     </div>
   </x-card>
@@ -29,7 +29,7 @@ import XCard from '~/components/XCard.vue'
 
 interface Props {
   item: {
-    title: string
+    name: string
     image: {
       src: string
       alt: string

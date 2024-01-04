@@ -22,7 +22,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/error',
     alias: '/:pathMatch(.*)*',
-    name: 'Error',
+    name: 'warning',
     props: true,
     component: Error,
   },

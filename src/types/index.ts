@@ -9,6 +9,7 @@ export interface Pokemon {
     speed: number;
   }
   type: PokemonType;
+  starred?: boolean;
 }
 
 export type PokemonType =

@@ -18,7 +18,7 @@
     <x-button @click="fetchData" class="max-w-28 m-auto">Load more</x-button>
 
     <div
-      class="fixed top-0 left-0 w-screen h-screen z-50 bg-black bg-opacity-50"
+      class="fixed top-0 left-0 w-screen h-screen z-20 bg-black bg-opacity-50"
       v-if="selected"
       @click.self="closeCard"
     >
@@ -34,6 +34,8 @@
           :item="selectedDetails"
           style="transform: rotateY(180deg)"
           class="backface-hidden absolute top-0"
+          @starred="addToFavorites"
+          @unstarred="removeFromFavorites"
         />
       </div>
     </div>
@@ -41,16 +43,18 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref } from 'vue'
+import { capitalize, nextTick, ref } from 'vue'
 import PreviewCard from '~/components/PreviewCard.vue'
 import DetailsCard from '~/components/DetailsCard.vue'
 import XButton from '~/components/XButton.vue'
 import { injectStrict } from '~/utils/injection'
 import { ApiKey } from '~/utils/symbols'
 import { Pokemon } from '~/types'
+import { useUserStore } from '~/stores/user'
+import { useAppStore } from '~/stores/app'
 
 interface Card {
-  title: string
+  name: string
   color?: string
   image: {
     src: string
@@ -67,6 +71,9 @@ const limit = 20
 
 const api = injectStrict(ApiKey)
 
+const userStore = useUserStore()
+const appStore = useAppStore()
+
 const fetchData = () => {
   api.pokemon
     .getAll({
@@ -75,7 +82,7 @@ const fetchData = () => {
     })
     .then((data) => {
       const parsed = data.results.map((item) => ({
-        title: item.name,
+        name: item.name,
         image: {
           src: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${
             item.url.split('/')[6]
@@ -107,8 +114,9 @@ const selectCard = (item: Card, event: MouseEvent) => {
     }
   })
 
-  api.pokemon.getOne(item.title).then((pokemon) => {
+  api.pokemon.getOne(item.name).then((pokemon) => {
     selectedDetails.value = pokemon
+    document.body.style.overflow = 'hidden'
   })
 }
 
@@ -116,6 +124,30 @@ const closeCard = () => {
   selected.value = null
   selectedPosition.value = null
   selectedDetails.value = null
+  document.body.style.overflow = 'auto'
+}
+
+const addToFavorites = (item: Pokemon) => {
+  const name = capitalize(item.name)
+  selectedDetails.value!.starred = true
+  userStore.addFavorite(name)
+
+  appStore.addToast({
+    message: `${name} added to favorites`,
+    type: 'success',
+  })
+}
+
+const removeFromFavorites = (item: Pokemon) => {
+  const name = capitalize(item.name)
+
+  selectedDetails.value!.starred = false
+  userStore.removeFavorite(name)
+
+  appStore.addToast({
+    message: `${name} removed from favorites`,
+    type: 'warning',
+  })
 }
 
 fetchData()
