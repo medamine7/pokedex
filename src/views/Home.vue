@@ -30,7 +30,6 @@
       >
         <preview-card :item="selected" class="backface-hidden" />
         <details-card
-          v-if="selectedDetails"
           :item="selectedDetails"
           style="transform: rotateY(180deg)"
           class="backface-hidden absolute top-0"
@@ -64,7 +63,7 @@ interface Card {
 
 const items = ref<Card[]>([])
 const selected = ref<Card | null>(null)
-const selectedDetails = ref<Pokemon | null>(null)
+const selectedDetails = ref<Pokemon | undefined>(undefined)
 const selectedPosition = ref<{ top: number; left: number } | null>(null)
 const offset = ref(0)
 const limit = 20
@@ -123,7 +122,7 @@ const selectCard = (item: Card, event: MouseEvent) => {
 const closeCard = () => {
   selected.value = null
   selectedPosition.value = null
-  selectedDetails.value = null
+  selectedDetails.value = undefined
   document.body.style.overflow = 'auto'
 }
 
