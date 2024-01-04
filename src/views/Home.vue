@@ -130,7 +130,7 @@ const closeCard = () => {
 const addToFavorites = (item: Pokemon) => {
   const name = capitalize(item.name)
   selectedDetails.value!.starred = true
-  userStore.addFavorite(name)
+  userStore.addFavorite(item.name)
 
   appStore.addToast({
     message: `${name} added to favorites`,
@@ -142,7 +142,7 @@ const removeFromFavorites = (item: Pokemon) => {
   const name = capitalize(item.name)
 
   selectedDetails.value!.starred = false
-  userStore.removeFavorite(name)
+  userStore.removeFavorite(item.name)
 
   appStore.addToast({
     message: `${name} removed from favorites`,
