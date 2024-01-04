@@ -12,6 +12,6 @@ interface Props {
 const props = defineProps<Props>()
 
 const icon = defineAsyncComponent(
-  () => import(`/src/assets/icons/${props.name}.svg`),
+  () => import(`../assets/icons/${props.name}.svg`),
 )
 </script>

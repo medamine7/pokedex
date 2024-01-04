@@ -6,7 +6,7 @@
     <div class="flex justify-between pt-3 px-3 items-center">
       <img :src="item.sprite" :alt="item.name" class="h-5" draggable="false" />
 
-      <x-badge class="bg-white flex gap-2">
+      <x-badge class="bg-white flex gap-2" data-role="hp-badge">
         <span class="text-neutral-800 text-[6px] font-bold capitalize">HP</span>
         <span class="text-xs font-bold">{{ item.stats.hp }}</span>
       </x-badge>
@@ -40,22 +40,19 @@
         :style="{
           'background-color': color,
         }"
+        data-role="type-badge"
       >
         <span class="text-white text-[9px] capitalize">{{ item.type }}</span>
       </x-badge>
 
       <ul class="text-[8px] flex justify-between mt-auto w-full">
-        <li class="flex text-neutral-800 flex-col gap-1">
-          <h6 class="font-bold">{{ item.stats.attack }}</h6>
-          <p class="text-neutral-600">Attack</p>
-        </li>
-        <li class="flex text-neutral-800 flex-col gap-1">
-          <h6 class="font-bold">{{ item.stats.defense }}</h6>
-          <p class="text-neutral-600">Defense</p>
-        </li>
-        <li class="flex text-neutral-800 flex-col gap-1">
-          <h6 class="font-bold">{{ item.stats.speed }}</h6>
-          <p class="text-neutral-600">Speed</p>
+        <li
+          class="flex text-neutral-800 flex-col gap-1 items-center"
+          v-for="(stat, index) in stats"
+          :key="index"
+        >
+          <h6 class="font-bold">{{ stat.value }}</h6>
+          <p class="text-neutral-600">{{ stat.name }}</p>
         </li>
       </ul>
     </div>
@@ -79,6 +76,27 @@ const emit = defineEmits<{
   starred: [value: Pokemon]
   unstarred: [value: Pokemon]
 }>()
+
+const stats = computed(() => {
+  if (!props.item) return []
+
+  const { attack, defense, speed } = props.item.stats
+
+  return [
+    {
+      name: 'Attack',
+      value: attack,
+    },
+    {
+      name: 'Defense',
+      value: defense,
+    },
+    {
+      name: 'Speed',
+      value: speed,
+    },
+  ]
+})
 
 const color = computed(() => {
   if (!props.item) return ''
