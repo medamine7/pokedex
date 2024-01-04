@@ -1,7 +1,7 @@
 <template>
   <svg
     aria-hidden="true"
-    class="text-gray-200 animate-spin dark:text-slate-700 fill-blue-600 m-auto"
+    class="text-gray-400 animate-spin fill-white m-auto"
     viewBox="0 0 100 101"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
