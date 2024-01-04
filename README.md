@@ -1,14 +1,14 @@
-# Frontend Coding Challenge
+# Pokemon index
 
-Clone this repo, run `npm install` and start the project using `npm run dev`.
-The instructions for completing the task can be found in the site that will launch.
+Pokemon cards index, using pokeAPI.
 
-## Additional Hints
+### How to start
 
-### Recommended IDE Setup
+- `yarn install`
+- `yarn dev`
 
-- [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar)
+### Tests
 
-### Type Support For `.vue` Imports in TS
-
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's `.vue` type support plugin by running `Volar: Switch TS Plugin on/off` from VSCode command palette.
+- Unit only: `yarn unit`
+- Component only: `yarn cypress`
+- For both: `yarn test`
