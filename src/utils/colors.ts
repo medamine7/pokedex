@@ -1,6 +1,6 @@
 import { PokemonType } from "~/types";
 
-export const pokemonThemes: Record<PokemonType, string> = {
+export const pokemonColors: Record<PokemonType, string> = {
   bug: "#26de81",
   dragon: "#ffeaa7",
   electric: "#fed330",

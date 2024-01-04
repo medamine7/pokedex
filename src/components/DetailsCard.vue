@@ -68,7 +68,7 @@ import XCard from '~/components/XCard.vue'
 import XBadge from '~/components/XBadge.vue'
 import XIcon from '~/components/XIcon.vue'
 import { Pokemon } from '~/types'
-import { pokemonThemes } from '~/utils/colors'
+import { pokemonColors } from '~/utils/colors'
 
 interface Props {
   item: Pokemon
@@ -83,7 +83,7 @@ const emit = defineEmits<{
 const color = computed(() => {
   if (!props.item) return ''
 
-  return pokemonThemes[props.item.type]
+  return pokemonColors[props.item.type]
 })
 
 const onStarred = () => {
